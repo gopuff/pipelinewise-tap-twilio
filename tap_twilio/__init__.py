@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import logging
 import sys
 import json
 import argparse
@@ -18,6 +19,27 @@ REQUIRED_CONFIG_KEYS = [
     'user_agent'
 ]
 
+
+class _SingerMetricToDebugFilter(logging.Filter):
+    """Demote singer METRIC lines (HTTP timers, record counters) from INFO to DEBUG."""
+
+    def filter(self, record):
+        try:
+            message = record.getMessage()
+        except Exception:  # pylint: disable=broad-except
+            return True
+        if message.startswith('METRIC:'):
+            record.levelno = logging.DEBUG
+            record.levelname = 'DEBUG'
+        return True
+
+
+def _configure_quiet_metrics():
+    singer_logger = logging.getLogger('singer')
+    if not any(isinstance(f, _SingerMetricToDebugFilter) for f in singer_logger.filters):
+        singer_logger.addFilter(_SingerMetricToDebugFilter())
+
+
 def do_discover():
     LOGGER.info('Starting discover')
     catalog = discover()
@@ -27,6 +49,7 @@ def do_discover():
 
 @singer.utils.handle_top_exception(LOGGER)
 def main():
+    _configure_quiet_metrics()
 
     parsed_args = singer.utils.parse_args(REQUIRED_CONFIG_KEYS)
 
