@@ -305,7 +305,7 @@ def sync_endpoint(
                     last_datetime=last_datetime,
                     parent=parent,
                     parent_id=parent_id)
-                LOGGER.info('Stream %s, batch processed %s records', stream_name, record_count)
+                LOGGER.debug('Stream %s, batch processed %s records', stream_name, record_count)
             else:
                 record_count = 0
 
@@ -315,7 +315,7 @@ def sync_endpoint(
                 for child_stream_name, child_endpoint_config in children.items():
                     # will this work if only grandchildren are selected
                     if child_stream_name in selected_streams:
-                        LOGGER.info('START Syncing: %s', child_stream_name)
+                        LOGGER.debug('START Syncing: %s', child_stream_name)
                         write_schema(catalog, child_stream_name)
                         # For each parent record
                         for record in transformed_data:
@@ -330,7 +330,7 @@ def sync_endpoint(
                             parent_id = record.get(parent_id_field)
 
                             # sync_endpoint for child
-                            LOGGER.info(
+                            LOGGER.debug(
                                 'START Sync for Stream: %s, parent_stream: %s, parent_id: %s', child_stream_name,
                                 stream_name, parent_id)
 
@@ -370,11 +370,11 @@ def sync_endpoint(
                                     parent_id=parent_id,
                                     account_sid=account_sid)
                             else:
-                                LOGGER.info(
+                                LOGGER.debug(
                                     'No child stream %s for parent stream %s in subresource uris',
                                     child_stream_name, stream_name)
                                 child_total_records = 0
-                            LOGGER.info('FINISHED Sync for Stream: %s, parent_id: %s, total_records: %s',
+                            LOGGER.debug('FINISHED Sync for Stream: %s, parent_id: %s, total_records: %s',
                                         child_stream_name,
                                         parent_id, child_total_records)
                             # End transformed data record loop
@@ -392,7 +392,7 @@ def sync_endpoint(
             # to_rec: to record; ending record for the batch page
             to_rec = min(offset + limit, total_records)
 
-            LOGGER.info('Synced Stream: %s, page: %s, %s to %s of total records: %s',
+            LOGGER.debug('Synced Stream: %s, page: %s, %s to %s of total records: %s',
                         stream_name,
                         page,
                         offset,
@@ -451,7 +451,7 @@ def sync(client, config, catalog, state):
     # Get selected_streams from catalog, based on state last_stream
     #   last_stream = Previous currently synced stream, if the load was interrupted
     last_stream = singer.get_currently_syncing(state)
-    LOGGER.info('last/currently syncing stream: %s', last_stream)
+    LOGGER.debug('last/currently syncing stream: %s', last_stream)
     selected_streams = []
     for stream in catalog.get_selected_streams(state):
         selected_streams.append(stream.stream)
@@ -478,8 +478,8 @@ def sync(client, config, catalog, state):
             # Append un-selected parent streams of selected children
             if parent_stream not in selected_streams:
                 parent_streams.append(parent_stream)
-    LOGGER.info('Sync Parent Streams: %s', parent_streams)
-    LOGGER.info('Sync Child Streams: %s', child_streams)
+    LOGGER.debug('Sync Parent Streams: %s', parent_streams)
+    LOGGER.debug('Sync Child Streams: %s', child_streams)
 
     if not selected_streams or selected_streams == []:
         return
