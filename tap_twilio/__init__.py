@@ -20,24 +20,34 @@ REQUIRED_CONFIG_KEYS = [
 ]
 
 
-class _SingerMetricToDebugFilter(logging.Filter):
-    """Demote singer METRIC lines (HTTP timers, record counters) from INFO to DEBUG."""
+class _SuppressSingerMetricsFilter(logging.Filter):
+    """Drop singer METRIC lines (HTTP timers, record counters) unless DEBUG is enabled.
+
+    Demoting levelno to DEBUG is unreliable under Meltano: the extractor stderr is
+    captured and re-logged at INFO with the original message text still visible.
+    Returning False removes the lines at the source.
+    """
 
     def filter(self, record):
         try:
             message = record.getMessage()
         except Exception:  # pylint: disable=broad-except
             return True
-        if message.startswith('METRIC:'):
-            record.levelno = logging.DEBUG
-            record.levelname = 'DEBUG'
-        return True
+        if not message.startswith('METRIC:'):
+            return True
+        # Keep metrics only when the singer logger (or root) is at DEBUG.
+        singer_logger = logging.getLogger('singer')
+        return singer_logger.isEnabledFor(logging.DEBUG) or logging.getLogger().isEnabledFor(logging.DEBUG)
 
 
 def _configure_quiet_metrics():
     singer_logger = logging.getLogger('singer')
-    if not any(isinstance(f, _SingerMetricToDebugFilter) for f in singer_logger.filters):
-        singer_logger.addFilter(_SingerMetricToDebugFilter())
+    # Replace any previous demote-only filter from earlier quieter-logging work.
+    singer_logger.filters = [
+        f for f in singer_logger.filters if not f.__class__.__name__.endswith('MetricToDebugFilter')
+        and not isinstance(f, _SuppressSingerMetricsFilter)
+    ]
+    singer_logger.addFilter(_SuppressSingerMetricsFilter())
 
 
 def do_discover():
