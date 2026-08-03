@@ -192,9 +192,8 @@ def sync_endpoint(
 
     # pylint: disable=too-many-nested-blocks
     while start_window < now_datetime:
-        # Per date-window progress is DEBUG; stream-level START/FINISHED Syncing stay INFO.
-        LOGGER.debug('START Sync for Stream: %s%s', stream_name,
-                     ', Date window from: {} to {}'.format(start_window, end_window) if bookmark_query_field_from else '')
+        LOGGER.info('START Sync for Stream: %s%s', stream_name,
+                    ', Date window from: {} to {}'.format(start_window, end_window) if bookmark_query_field_from else '')
 
         params = static_params  # adds in endpoint specific, sort, filter params
 
