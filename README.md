@@ -427,6 +427,21 @@ Install python test dependencies in a virtual env and run linter
 make venv pylint
 ```
 
+## Releasing
+
+This fork is installed from git tags (`pip install git+https://github.com/gopuff/pipelinewise-tap-twilio.git@vX.Y.Z`),
+never from PyPI. Versions continue from upstream 1.1.2 using semver: minor for behavior changes, patch for fixes.
+
+1. In the PR with the change, bump `version` in `setup.py` and add a `CHANGELOG.md` entry.
+2. Merge once CI passes.
+3. Tag the merge commit and push the tag:
+```
+git tag -a vX.Y.Z -m "<summary>" <merge commit>
+git push origin vX.Y.Z
+```
+
+Tags are immutable: never move or delete one that has been pushed. Ship a fix as a new patch version instead.
+
 ## Licence
 
 GNU AFFERO GENERAL PUBLIC [LICENSE](./LICENSE)
