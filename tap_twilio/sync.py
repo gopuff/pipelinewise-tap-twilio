@@ -327,7 +327,8 @@ def sync_endpoint(
                                 if id_field == 'id':
                                     parent_id_field = id_field
                                 i = i + 1
-                            parent_id = record.get(parent_id_field)
+                            # id_fields is never empty here: the only stream without key_properties has no children
+                            parent_id = record.get(parent_id_field)  # pylint: disable=possibly-used-before-assignment
 
                             # sync_endpoint for child
                             LOGGER.debug(
@@ -498,7 +499,7 @@ def sync(client, config, catalog, state):
                 config=config,
                 catalog=catalog,
                 state=state,
-                start_date=start_date,
+                start_date=start_date,  # pylint: disable=possibly-used-before-assignment  # required config key
                 stream_name=stream_name,
                 path=path,
                 endpoint_config=endpoint_config,

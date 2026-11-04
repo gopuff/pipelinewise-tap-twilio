@@ -1,3 +1,14 @@
+Unreleased
+-------------------
+- CI runs pylint and unit tests on Python 3.12 and 3.13, on current actions; pylint is `>=4.1,<5`.
+- Remove the PyPI publish workflow. This fork is installed from git tags, never from PyPI.
+
+1.1.4 (2026-08-03)
+-------------------
+First gopuff release tag (`v1.1.4`, on the #2 merge commit). Covers everything since upstream 1.1.2:
+- Python 3.12 support: `requests` and `singer-python` unpinned, the singer-python fork swapped for upstream (1.1.3).
+- Quieter INFO logging for long-running syncs, and METRIC HTTP logs suppressed under Meltano (#1, #2).
+
 1.1.2 (2021-03-16)
 -------------------
 - Fix missing elements for streams without ordered response
