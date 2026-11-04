@@ -5,9 +5,9 @@ Unreleased
 
 1.1.4 (2026-08-03)
 -------------------
-First gopuff release tag (`v1.1.4`, on the #2 merge commit). Covers everything since upstream 1.1.2:
+First gopuff release tag (`v1.1.4`, on merge commit `5ac50a48`). Covers everything since upstream 1.1.2:
 - Python 3.12 support: `requests` and `singer-python` unpinned, the singer-python fork swapped for upstream (1.1.3).
-- Quieter INFO logging for long-running syncs, and METRIC HTTP logs suppressed under Meltano (#1, #2).
+- Quieter INFO logging for long-running syncs, and METRIC HTTP logs suppressed under Meltano (`8d1390d`, `94fcfbf`, `a0cc902`).
 
 1.1.2 (2021-03-16)
 -------------------
